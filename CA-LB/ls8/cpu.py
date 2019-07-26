@@ -26,6 +26,7 @@ class CPU:
         self.register = [0] * 8
         self.pc = 0
         self.sp = 7
+        self.flag = False
 
     def ram_read(self, address):
         return self.ram[address]
@@ -68,8 +69,12 @@ class CPU:
         elif op == "MUL":
             self.register[reg_a] *= self.register[reg_b]
         elif op == "CMP":
-            while self.register[reg_a] == self.register[reg_b]:
-                flag = True  
+            # self.register[reg_a] == self.register[reg_b]
+            if self.register[reg_a] == self.register[reg_b]:
+                self.flag = True
+                # return True
+                # flag = True
+                print(f"comparison is {self.flag}")  
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -97,12 +102,13 @@ class CPU:
         """Run the CPU."""
 
         running = True
-        flag = False
+
         
         while running:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc+1)
-            operand_b = self.ram_read(self.pc+2)            
+            operand_b = self.ram_read(self.pc+2)
+            # flag = False            
 
             if IR == LDI:
                 self.register[operand_a] = operand_b
@@ -148,11 +154,19 @@ class CPU:
                 self.register[self.sp] += 1
                 self.pc = ret
 
-            elif IR == CMP:
+            elif IR == CMP: 
                 print("CMP")
-                self.alu("CMP",operand_a, operand_b)
-                print(f"Flag set to {flag}")
-                self.pc += 3
+                # self.alu("CMP",operand_a, operand_b)
+                # print(f"Flag set to {flag}")
+                # self.pc += 3
+                if self.alu("CMP", operand_a, operand_b) is True:
+                    # flag = True
+                    print(f"Flag set to {self.flag}")
+                    self.pc += 3
+                else:
+                    print(f"Flag set to {self.flag}")
+                    self.pc += 3
+
             
             elif IR == JMP:
                 print("JMP")
@@ -163,9 +177,10 @@ class CPU:
 
             elif IR == JEQ:
                 print("JEQ")
-                if flag == True:
+                #if
                     # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
                     # print(f"Jumped to {operand_a}")
+                if self.flag == True:
                     jumper = self.register[operand_a]
                     self.pc = jumper
                     print(f"Jumped to {jumper}")
@@ -174,9 +189,10 @@ class CPU:
 
             elif IR == JNE:
                 print("JNE")
-                if flag == False:
+                #if
                     # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
                     # print(f"Jumped to {operand_a}")
+                if self.flag == False:
                     jumper = self.register[operand_a]
                     self.pc = jumper
                     print(f"Jumped to {jumper}")
