@@ -24,9 +24,9 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.register = [0] * 8
-        self.pc = 0
-        self.sp = 7
-        self.flag = False
+        self.pc = 0 #program counter
+        self.sp = 7 #Stack Pointer
+        self.flag = False #CMP E
 
     def ram_read(self, address):
         return self.ram[address]
@@ -68,13 +68,13 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "MUL":
             self.register[reg_a] *= self.register[reg_b]
-        elif op == "CMP":
+        elif op == "CMP": #Compare to change the Equals flag
             # self.register[reg_a] == self.register[reg_b]
             if self.register[reg_a] == self.register[reg_b]:
                 self.flag = True
                 # return True
                 # flag = True
-                print(f"comparison is {self.flag}")  
+                print(f"CMP, comparison is {self.flag}")  
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -155,7 +155,6 @@ class CPU:
                 self.pc = ret
 
             elif IR == CMP: 
-                print("CMP")
                 # self.alu("CMP",operand_a, operand_b)
                 # print(f"Flag set to {flag}")
                 # self.pc += 3
@@ -164,7 +163,7 @@ class CPU:
                     print(f"Flag set to {self.flag}")
                     self.pc += 3
                 else:
-                    print(f"Flag set to {self.flag}")
+                    print(f"CMP, Comparison {self.flag}, Flag set to {self.flag}")
                     self.pc += 3
 
             
@@ -176,31 +175,33 @@ class CPU:
                 print(f"Jumped to {jumper}")
 
             elif IR == JEQ:
-                print("JEQ")
                 #if
                     # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
                     # print(f"Jumped to {operand_a}")
+                # if flag == True:
                 if self.flag == True:
                     jumper = self.register[operand_a]
                     self.pc = jumper
-                    print(f"Jumped to {jumper}")
+                    print(f"JEQ, EQUAL, flag is {self.flag}, Jumped to {jumper}")
                 else:
+                    print(f"JEQ, no jump")
                     self.pc += 2
 
             elif IR == JNE:
-                print("JNE")
                 #if
                     # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
                     # print(f"Jumped to {operand_a}")
+                #if flag == False:    
                 if self.flag == False:
                     jumper = self.register[operand_a]
                     self.pc = jumper
-                    print(f"Jumped to {jumper}")
+                    print(f"JNE, NOT EQUAL, flag is {self.flag}, Jumped to {jumper}")
                 else:
+                    print("JNE, no jump")
                     self.pc += 2            
         
             if IR == PRN:
-                print(f"PRN {self.register[operand_a]}")
+                print(f"PRN, PRINTING...................... NUMBER IS: {self.register[operand_a]}")
                 self.pc += 2
                 
             elif IR == HLT:
