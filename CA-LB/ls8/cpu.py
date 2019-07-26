@@ -13,8 +13,9 @@ CALL = 0b01010000
 RET = 0b00010001
 ADD = 0b10100000
 CMP = 0b10100111
-
-
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110  
 
 class CPU:
     """Main CPU class."""
@@ -67,7 +68,7 @@ class CPU:
         elif op == "MUL":
             self.register[reg_a] *= self.register[reg_b]
         elif op == "CMP":
-            if self.register[reg_a] == self.register[reg_b]:
+            while self.register[reg_a] == self.register[reg_b]:
                 flag = True  
         else:
             raise Exception("Unsupported ALU operation")
@@ -101,8 +102,7 @@ class CPU:
         while running:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc+1)
-            operand_b = self.ram_read(self.pc+2)
-            
+            operand_b = self.ram_read(self.pc+2)            
 
             if IR == LDI:
                 self.register[operand_a] = operand_b
@@ -153,7 +153,36 @@ class CPU:
                 self.alu("CMP",operand_a, operand_b)
                 print(f"Flag set to {flag}")
                 self.pc += 3
+            
+            elif IR == JMP:
+                print("JMP")
+                # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
+                jumper = self.register[operand_a]
+                self.pc = jumper
+                print(f"Jumped to {jumper}")
 
+            elif IR == JEQ:
+                print("JEQ")
+                if flag == True:
+                    # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
+                    # print(f"Jumped to {operand_a}")
+                    jumper = self.register[operand_a]
+                    self.pc = jumper
+                    print(f"Jumped to {jumper}")
+                else:
+                    self.pc += 2
+
+            elif IR == JNE:
+                print("JNE")
+                if flag == False:
+                    # self.ram[self.register[self.pc]] == self.ram[self.register[operand_a]]
+                    # print(f"Jumped to {operand_a}")
+                    jumper = self.register[operand_a]
+                    self.pc = jumper
+                    print(f"Jumped to {jumper}")
+                else:
+                    self.pc += 2            
+        
             if IR == PRN:
                 print(f"PRN {self.register[operand_a]}")
                 self.pc += 2
@@ -162,6 +191,13 @@ class CPU:
                 running = False
                 print("HLT")
                 self.pc += 1
+
+# Code to test the Sprint Challenge
+#
+# Expected output:
+# 1
+# 4
+# 5
 
 #OLD CODE----------------------------------------------------------------------------------------     
         # for instruction in program:
